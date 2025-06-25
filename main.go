@@ -21,7 +21,6 @@ func main() {
 		}
 		running = selectFeat(menuOption)
 	}
-	// clearScreen()
 	printGoodbyeMessage()
 }
 
@@ -31,12 +30,10 @@ func selectFeat(menuOption int) bool {
 		return false
 	case 1:
 		registerPerson()
-		// clearScreen()
 		printWelcomeMessage()
 		return true
 	default:
 		fmt.Println("Invalid Option!")
-		// clearScreen()
 		printMenu()
 		return true
 	}
