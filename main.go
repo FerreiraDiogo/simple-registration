@@ -8,13 +8,41 @@ import (
 )
 
 func main() {
+
 	running := true
+	var menuOption int
 	printWelcomeMessage()
 	for running {
-		running = false
+		_, err := fmt.Scanf("%d", &menuOption)
+		if err != nil {
+			fmt.Println("Please, type a valid option")
+			continue
+		}
+		running = selectFeat(menuOption)
 	}
-	clearScreen()
+	// clearScreen()
 	printGoodbyeMessage()
+}
+
+func selectFeat(menuOption int) bool {
+	switch menuOption {
+	case 0:
+		return false
+	case 1:
+		registerPerson()
+		// clearScreen()
+		printWelcomeMessage()
+		return true
+	default:
+		fmt.Println("Invalid Option!")
+		// clearScreen()
+		printMenu()
+		return true
+	}
+}
+
+func registerPerson() {
+	fmt.Println("Mock a Person registration!")
 }
 
 func printGoodbyeMessage() {
@@ -23,9 +51,13 @@ func printGoodbyeMessage() {
 
 func printWelcomeMessage() {
 	fmt.Println("==========Simple People Registrator V1.0.0==========")
-	fmt.Println("========================Menu========================")
-	fmt.Printf("1 - Register New Person\n2 - Update People\n3 - List People\n4 - Find People by name\n5 - Remove People by name\n6 - Quit")
+	printMenu()
 
+}
+
+func printMenu() {
+	fmt.Println("========================Menu========================")
+	fmt.Printf("1 - Register New Person\n2 - Update People\n3 - List People\n4 - Find People by name\n5 - Remove People by name\n0 - Quit\n")
 }
 
 func clearScreen() {
