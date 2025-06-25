@@ -16,6 +16,7 @@ func main() {
 		_, err := fmt.Scanf("%d", &menuOption)
 		if err != nil {
 			fmt.Println("Please, type a valid option")
+			printMenu()
 			continue
 		}
 		running = selectFeat(menuOption)
