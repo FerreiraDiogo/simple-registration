@@ -7,18 +7,17 @@ import (
 )
 
 type Person struct {
-	name      string
-	address   string
-	email     string
-	phone     string
-	birthDate time.Time
+	Name      string
+	Address   string
+	Email     string
+	Phone     string
+	BirthDate time.Time
 }
 
 func (p Person) String() {
-	fmt.Printf("Name: %s, Age: %s, Address: %s, E-mail: %s, Phone Number: %s\n", p.name, p.GetAge(), p.address, p.email, p.phone)
+	fmt.Printf("Name: %s, Age: %s, Address: %s, E-mail: %s, Phone Number: %s\n", p.Name, p.GetAge(), p.Address, p.Email, p.Phone)
 }
 
 func (p Person) GetAge() string {
-	//TODO: cálculo da idade a partir da data de nascimento
-	return strconv.Itoa(time.Now().Year() - p.birthDate.Year())
+	return strconv.Itoa(time.Now().Year() - p.BirthDate.Year())
 }
