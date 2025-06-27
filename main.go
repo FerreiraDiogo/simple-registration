@@ -1,10 +1,16 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
+	"simple-registration/person"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func main() {
@@ -40,7 +46,91 @@ func selectFeat(menuOption int) bool {
 }
 
 func registerPerson() {
-	fmt.Println("Mock a Person registration!")
+	var name string
+	var address string
+	var email string
+	var phonePrefix string
+	var phoneNumber string
+	var birthDate string
+
+	running := true
+
+	for running {
+		if len(name) == 0 {
+			fmt.Print("Insert name:")
+			fmt.Scanf("%s", &name)
+			_, nameErr := validateStringInput(name, nil)
+			if nameErr != nil {
+				fmt.Println(nameErr)
+				name = ""
+				continue
+			}
+		}
+
+		if len(address) == 0 {
+			fmt.Print("Insert address:")
+			fmt.Scanf("%s", &address)
+			_, addErr := validateStringInput(address, nil)
+			if addErr != nil {
+				fmt.Println(addErr)
+				address = ""
+				continue
+
+			}
+
+		}
+		if len(email) == 0 {
+			fmt.Print("Insert email:")
+			fmt.Scanf("%s", &email)
+			_, mailErr := validateStringInput(email, validateEmail)
+			if mailErr != nil {
+				fmt.Println(mailErr)
+				email = ""
+				continue
+			}
+		}
+		if len(phonePrefix) == 0 || len(phoneNumber) == 0 {
+			fmt.Print("Insert phone prefix:")
+			fmt.Scanf("%s", &phonePrefix)
+			fmt.Print("Insert phone number:")
+			fmt.Scanf("%s", &phoneNumber)
+			_, phoneErr := validateStringInput(phonePrefix+phoneNumber, validatePhoneNumber)
+			if phoneErr != nil {
+				fmt.Println(phoneErr)
+				phonePrefix = ""
+				phoneNumber = ""
+				continue
+			}
+		}
+
+		if len(birthDate) == 0 {
+			fmt.Print("Insert birthdate:")
+			fmt.Scanf("%s", &birthDate)
+			_, ageErr := validateStringInput(birthDate, validateAge)
+			if ageErr != nil {
+				fmt.Println(ageErr)
+				birthDate = ""
+				continue
+			}
+		}
+
+		running = false
+	}
+	bDate, _ := time.Parse(time.DateOnly, birthDate)
+	p := person.Person{name, address, email, phonePrefix + phoneNumber, bDate}
+	fmt.Printf("%s registered with Success!", p.Name)
+}
+
+// Validates if an input is a valid string and performs aditional
+// validation provided by callbacl
+func validateStringInput(input string, callback func(string) (bool, error)) (bool, error) {
+	if len(input) == 0 || len(strings.TrimSpace(input)) == 0 {
+		return false, errors.New("Input Cannot be empty or contain only white Spaces!")
+	}
+	if callback == nil {
+		return true, nil
+	}
+	return callback(input)
 }
 
 func printGoodbyeMessage() {
@@ -67,4 +157,37 @@ func clearScreen() {
 	}
 	cmd.Stdout = os.Stdout
 	cmd.Run()
+}
+
+func validatePhoneNumber(phoneNumber string) (bool, error) {
+	_, parseErr := strconv.ParseInt(phoneNumber, 0, 64)
+	if parseErr != nil {
+		return false, errors.New("Phone number must contain only numbers")
+	}
+	if len(phoneNumber) < 10 || len(phoneNumber) > 11 {
+		return false, errors.New("Phone number can't have less than 8 or more than 9 digits")
+	}
+	return true, nil
+}
+
+func validateAge(birthDate string) (bool, error) {
+	convertedAge, parseErr := time.Parse(time.DateOnly, birthDate)
+	if parseErr != nil {
+		return false, errors.New("Birthdate format is 'YYYY-MM-DD' ")
+	}
+	if time.Now().Year()-convertedAge.Year() <= 0 {
+		return false, errors.New("Inserted birthdate is invalid. Age Must be greater than 0")
+	}
+	return true, nil
+}
+
+func validateEmail(email string) (bool, error) {
+	regex, regexErr := regexp.Compile("^[^@]+@[^@]+\\.[^@]+$")
+	if regexErr != nil {
+		panic("Regexp error!")
+	}
+	if !regex.MatchString(email) {
+		return false, errors.New("Invalid email. Valid format is 'mail@domain.com'")
+	}
+	return true, nil
 }
