@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"os"
@@ -54,11 +55,13 @@ func registerPerson() {
 	var birthDate string
 
 	running := true
+	reader := bufio.NewReader(os.Stdin)
 
 	for running {
 		if len(name) == 0 {
 			fmt.Print("Insert name:")
-			fmt.Scanf("%s", &name)
+			name, _ = sanitize(reader.ReadString('\n'))
+
 			_, nameErr := validateStringInput(name, nil)
 			if nameErr != nil {
 				fmt.Println(nameErr)
@@ -69,7 +72,7 @@ func registerPerson() {
 
 		if len(address) == 0 {
 			fmt.Print("Insert address:")
-			fmt.Scanf("%s", &address)
+			address, _ = sanitize(reader.ReadString('\n'))
 			_, addErr := validateStringInput(address, nil)
 			if addErr != nil {
 				fmt.Println(addErr)
@@ -81,7 +84,7 @@ func registerPerson() {
 		}
 		if len(email) == 0 {
 			fmt.Print("Insert email:")
-			fmt.Scanf("%s", &email)
+			email, _ = sanitize(reader.ReadString('\n'))
 			_, mailErr := validateStringInput(email, validateEmail)
 			if mailErr != nil {
 				fmt.Println(mailErr)
@@ -91,9 +94,9 @@ func registerPerson() {
 		}
 		if len(phonePrefix) == 0 || len(phoneNumber) == 0 {
 			fmt.Print("Insert phone prefix:")
-			fmt.Scanf("%s", &phonePrefix)
+			phonePrefix, _ = sanitize(reader.ReadString('\n'))
 			fmt.Print("Insert phone number:")
-			fmt.Scanf("%s", &phoneNumber)
+			phoneNumber, _ = sanitize(reader.ReadString('\n'))
 			_, phoneErr := validateStringInput(phonePrefix+phoneNumber, validatePhoneNumber)
 			if phoneErr != nil {
 				fmt.Println(phoneErr)
@@ -105,7 +108,7 @@ func registerPerson() {
 
 		if len(birthDate) == 0 {
 			fmt.Print("Insert birthdate:")
-			fmt.Scanf("%s", &birthDate)
+			birthDate, _ = sanitize(reader.ReadString('\n'))
 			_, ageErr := validateStringInput(birthDate, validateAge)
 			if ageErr != nil {
 				fmt.Println(ageErr)
@@ -117,8 +120,8 @@ func registerPerson() {
 		running = false
 	}
 	bDate, _ := time.Parse(time.DateOnly, birthDate)
-	p := person.Person{name, address, email, phonePrefix + phoneNumber, bDate}
-	fmt.Printf("%s registered with Success!", p.Name)
+	p := person.Person{Name: name, Address: address, Email: email, Phone: phonePrefix + phoneNumber, BirthDate: bDate}
+	fmt.Printf("%s registered with Success!\n\n", p.Name)
 }
 
 // Validates if an input is a valid string and performs aditional
@@ -190,4 +193,11 @@ func validateEmail(email string) (bool, error) {
 		return false, errors.New("Invalid email. Valid format is 'mail@domain.com'")
 	}
 	return true, nil
+}
+
+func sanitize(input string, err error) (string, error) {
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(input), nil
 }
