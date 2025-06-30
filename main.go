@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"simple-registration/fileutils"
 	"simple-registration/person"
 	"strconv"
 	"strings"
@@ -121,6 +122,8 @@ func registerPerson() {
 	}
 	bDate, _ := time.Parse(time.DateOnly, birthDate)
 	p := person.Person{Name: name, Address: address, Email: email, Phone: phonePrefix + phoneNumber, BirthDate: bDate}
+	fileutils.Write(p)
+	fileutils.Read()
 	fmt.Printf("%s registered with Success!\n\n", p.Name)
 }
 
