@@ -40,6 +40,10 @@ func selectFeat(menuOption int) bool {
 		registerPerson()
 		printWelcomeMessage()
 		return true
+	case 2:
+		updatePerson()
+		printWelcomeMessage()
+		return true
 	case 3:
 		listPeople()
 		printWelcomeMessage()
@@ -57,6 +61,11 @@ func selectFeat(menuOption int) bool {
 		printMenu()
 		return true
 	}
+}
+
+func updatePerson() {
+	fmt.Println("Type again the data of the person you want to update. Names are not updatable")
+	fileutils.Update(readPersonInput())
 }
 
 func removeByName() {
@@ -102,6 +111,13 @@ func listPeople() {
 }
 
 func registerPerson() {
+	p := readPersonInput()
+
+	fileutils.Write(readPersonInput())
+	fmt.Printf("%s registered with Success!\n\n", p.Name)
+}
+
+func readPersonInput() person.Person {
 	var name string
 	var address string
 	var email string
@@ -174,10 +190,7 @@ func registerPerson() {
 
 		running = false
 	}
-	bDate, _ := time.Parse(time.DateOnly, birthDate)
-	p := person.Person{Name: name, Address: address, Email: email, Phone: phonePrefix + phoneNumber, BirthDate: bDate}
-	fileutils.Write(p)
-	fmt.Printf("%s registered with Success!\n\n", p.Name)
+	return *person.NewPerson(name, address, email, phonePrefix+phoneNumber, birthDate)
 }
 
 // Validates if an input is a valid string and performs aditional
