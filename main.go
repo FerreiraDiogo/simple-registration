@@ -40,11 +40,28 @@ func selectFeat(menuOption int) bool {
 		registerPerson()
 		printWelcomeMessage()
 		return true
+	case 3:
+		listPeople()
+		printWelcomeMessage()
+		return true
 	default:
 		fmt.Println("Invalid Option!")
 		printMenu()
 		return true
 	}
+}
+
+func listPeople() {
+	people := fileutils.Read()
+	if len(people) == 0 {
+		fmt.Println("No one was registered yet.")
+	} else {
+		fmt.Println("The following people are registered")
+		for _, person := range people {
+			fmt.Println(person.String())
+		}
+	}
+
 }
 
 func registerPerson() {

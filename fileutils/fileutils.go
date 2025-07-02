@@ -1,10 +1,8 @@
 package fileutils
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"simple-registration/person"
 )
@@ -12,15 +10,13 @@ import (
 const PEOPLE_FILE_PATH = "people.json"
 
 func Write(people person.Person) {
-	// file, err := open()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	file, err := os.OpenFile(PEOPLE_FILE_PATH, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	file, err := open()
 	if err != nil {
-		errors.New("couldn' open file")
+		panic(err)
 	}
 	defer file.Close()
+
 	jsonified, marshErr := json.MarshalIndent(people, "", " ")
 	if marshErr != nil {
 		panic(marshErr)
@@ -41,11 +37,14 @@ func Read() []person.Person {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+	people := make([]person.Person, 0)
+	decoder := json.NewDecoder(file)
+	for decoder.More() {
+		p := person.Person{}
+		decoder.Decode(&p)
+		people = append(people, p)
 	}
-	return make([]person.Person, 0)
+
+	return people
 }
