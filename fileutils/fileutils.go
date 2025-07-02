@@ -89,9 +89,7 @@ func Delete(name string) {
 		}
 		if len(removed) > 0 {
 			clearFile()
-			for _, p := range removed {
-				Write(p)
-			}
+			writeAll(removed)
 		}
 
 		fmt.Printf("%s removed successfully\n", name)
@@ -108,6 +106,26 @@ func clearFile() {
 
 	file.Truncate(0)
 
+}
+
+func Update(updatedPerson person.Person) {
+
+	people := List()
+	for index, person := range people {
+		if namesAreEqual(person.Name, updatedPerson.Name) {
+			people[index] = updatedPerson
+			break
+		}
+	}
+	clearFile()
+	writeAll(people)
+
+}
+
+func writeAll(people []person.Person) {
+	for _, p := range people {
+		Write(p)
+	}
 }
 
 func namesAreEqual(n1, n2 string) bool {
