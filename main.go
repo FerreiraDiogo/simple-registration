@@ -48,11 +48,26 @@ func selectFeat(menuOption int) bool {
 		findByName()
 		printWelcomeMessage()
 		return true
+	case 5:
+		removeByName()
+		printWelcomeMessage()
+		return true
 	default:
 		fmt.Println("Invalid Option!")
 		printMenu()
 		return true
 	}
+}
+
+func removeByName() {
+	fmt.Println("Type the name of the person you want to remove")
+	var input string
+	reader := bufio.NewReader(os.Stdin)
+	input, err := sanitize(reader.ReadString('\n'))
+	if err != nil {
+		panic(err)
+	}
+	fileutils.Delete(input)
 }
 
 func findByName() {

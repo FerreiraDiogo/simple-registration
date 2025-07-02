@@ -3,8 +3,10 @@ package fileutils
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"simple-registration/person"
+	"slices"
 	"strings"
 )
 
@@ -64,10 +66,52 @@ func FindByName(name string) (person.Person, error) {
 			panic(err)
 		}
 
-		if strings.EqualFold(strings.ReplaceAll(name, " ", ""),
-			strings.ReplaceAll(p.Name, " ", "")) {
+		if namesAreEqual(name, p.Name) {
 			return p, nil
 		}
 	}
-	return person.Person{}, errors.New("No person with given name was found")
+	return person.Person{}, errors.New("no person with given name was found")
+}
+
+func Delete(name string) {
+	people := List()
+	var removed []person.Person
+	if len(people) == 0 {
+		fmt.Println("No one is registered yet")
+	} else if len(people) == 1 {
+		clearFile()
+	} else {
+		for index, person := range people {
+			if namesAreEqual(name, person.Name) {
+				removed = slices.Delete(people, index, index+1)
+				break
+			}
+		}
+		if len(removed) > 0 {
+			clearFile()
+			for _, p := range removed {
+				Write(p)
+			}
+		}
+
+		fmt.Printf("%s removed successfully\n", name)
+
+	}
+}
+
+func clearFile() {
+	file, err := open()
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	file.Truncate(0)
+
+}
+
+func namesAreEqual(n1, n2 string) bool {
+	return strings.EqualFold(strings.ReplaceAll(n1, " ", ""),
+		strings.ReplaceAll(n2, " ", ""))
+
 }
