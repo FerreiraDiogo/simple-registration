@@ -2,6 +2,7 @@ package fileutils
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -10,7 +11,7 @@ import (
 
 const PEOPLE_FILE_PATH = "people.json"
 
-func Write(person person.Person) {
+func Write(people person.Person) {
 	// file, err := open()
 	// if err != nil {
 	// 	panic(err)
@@ -20,8 +21,11 @@ func Write(person person.Person) {
 		errors.New("couldn' open file")
 	}
 	defer file.Close()
-	fmt.Println(person)
-	file.WriteString(person.String())
+	jsonified, marshErr := json.MarshalIndent(people, "", " ")
+	if marshErr != nil {
+		panic(marshErr)
+	}
+	file.Write(jsonified)
 }
 
 func open() (*os.File, error) {
