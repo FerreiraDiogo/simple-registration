@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"simple-registration/fileutils"
 	"simple-registration/person"
 	"strconv"
 	"strings"
@@ -39,11 +40,65 @@ func selectFeat(menuOption int) bool {
 		registerPerson()
 		printWelcomeMessage()
 		return true
+	case 3:
+		listPeople()
+		printWelcomeMessage()
+		return true
+	case 4:
+		findByName()
+		printWelcomeMessage()
+		return true
+	case 5:
+		removeByName()
+		printWelcomeMessage()
+		return true
 	default:
 		fmt.Println("Invalid Option!")
 		printMenu()
 		return true
 	}
+}
+
+func removeByName() {
+	fmt.Println("Type the name of the person you want to remove")
+	var input string
+	reader := bufio.NewReader(os.Stdin)
+	input, err := sanitize(reader.ReadString('\n'))
+	if err != nil {
+		panic(err)
+	}
+	fileutils.Delete(input)
+}
+
+func findByName() {
+
+	fmt.Println("Type the name of the person you are looking for. This search is case insentive")
+
+	reader := bufio.NewReader(os.Stdin)
+	input, err := sanitize(reader.ReadString('\n'))
+	if err != nil {
+		panic(err)
+	}
+	person, err := fileutils.FindByName(input)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(person.String())
+	}
+
+}
+
+func listPeople() {
+	people := fileutils.List()
+	if len(people) == 0 {
+		fmt.Println("No one was registered yet.")
+	} else {
+		fmt.Println("The following people are registered")
+		for _, person := range people {
+			fmt.Println(person.String())
+		}
+	}
+
 }
 
 func registerPerson() {
@@ -121,6 +176,7 @@ func registerPerson() {
 	}
 	bDate, _ := time.Parse(time.DateOnly, birthDate)
 	p := person.Person{Name: name, Address: address, Email: email, Phone: phonePrefix + phoneNumber, BirthDate: bDate}
+	fileutils.Write(p)
 	fmt.Printf("%s registered with Success!\n\n", p.Name)
 }
 
