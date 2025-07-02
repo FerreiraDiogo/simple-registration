@@ -44,6 +44,10 @@ func selectFeat(menuOption int) bool {
 		listPeople()
 		printWelcomeMessage()
 		return true
+	case 4:
+		findByName()
+		printWelcomeMessage()
+		return true
 	default:
 		fmt.Println("Invalid Option!")
 		printMenu()
@@ -51,8 +55,26 @@ func selectFeat(menuOption int) bool {
 	}
 }
 
+func findByName() {
+
+	fmt.Println("Type the name of the person you are looking for. This search is case insentive")
+
+	reader := bufio.NewReader(os.Stdin)
+	input, err := sanitize(reader.ReadString('\n'))
+	if err != nil {
+		panic(err)
+	}
+	person, err := fileutils.FindByName(input)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(person.String())
+	}
+
+}
+
 func listPeople() {
-	people := fileutils.Read()
+	people := fileutils.List()
 	if len(people) == 0 {
 		fmt.Println("No one was registered yet.")
 	} else {
@@ -140,7 +162,6 @@ func registerPerson() {
 	bDate, _ := time.Parse(time.DateOnly, birthDate)
 	p := person.Person{Name: name, Address: address, Email: email, Phone: phonePrefix + phoneNumber, BirthDate: bDate}
 	fileutils.Write(p)
-	fileutils.Read()
 	fmt.Printf("%s registered with Success!\n\n", p.Name)
 }
 

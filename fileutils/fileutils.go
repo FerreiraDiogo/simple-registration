@@ -5,19 +5,20 @@ import (
 	"errors"
 	"os"
 	"simple-registration/person"
+	"strings"
 )
 
 const PEOPLE_FILE_PATH = "people.json"
 
-func Write(people person.Person) {
+func Write(person person.Person) {
 
-	file, err := open()
-	if err != nil {
-		panic(err)
+	file, openErr := open()
+	if openErr != nil {
+		panic(openErr)
 	}
 	defer file.Close()
 
-	jsonified, marshErr := json.MarshalIndent(people, "", " ")
+	jsonified, marshErr := json.MarshalIndent(person, "", " ")
 	if marshErr != nil {
 		panic(marshErr)
 	}
@@ -25,14 +26,14 @@ func Write(people person.Person) {
 }
 
 func open() (*os.File, error) {
-	file, err := os.OpenFile(PEOPLE_FILE_PATH, os.O_CREATE, 0644)
+	file, err := os.OpenFile(PEOPLE_FILE_PATH, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		return nil, errors.New("couldn' open file")
 	}
 	return file, nil
 }
 
-func Read() []person.Person {
+func List() []person.Person {
 	file, err := open()
 	if err != nil {
 		panic(err)
@@ -47,4 +48,26 @@ func Read() []person.Person {
 	}
 
 	return people
+}
+
+func FindByName(name string) (person.Person, error) {
+
+	file, err := open()
+	if err != nil {
+		panic(err)
+	}
+	decoder := json.NewDecoder(file)
+	for decoder.More() {
+		var p person.Person
+		err := decoder.Decode(&p)
+		if err != nil {
+			panic(err)
+		}
+
+		if strings.EqualFold(strings.ReplaceAll(name, " ", ""),
+			strings.ReplaceAll(p.Name, " ", "")) {
+			return p, nil
+		}
+	}
+	return person.Person{}, errors.New("No person with given name was found")
 }
