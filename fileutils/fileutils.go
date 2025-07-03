@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const PEOPLE_FILE_PATH = "people.json"
+const PEOPLE_FILE_PATH = "../people.json"
 
 func Write(person person.Person) {
 
